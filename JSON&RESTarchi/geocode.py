@@ -1,6 +1,5 @@
 import urllib.request, urllib.parse
-import json
-import ssl
+import http, json, ssl
 
 serviceurl = 'https://py4e-data.dr-chuck.net/opengeo?'
 
@@ -12,7 +11,7 @@ while True:
     address = input('Enter location: ')
     if len(address) < 1: break
 
-    url = serviceurl + urllib.parse.urlencode({'q': address.strip()})
+    url = serviceurl + urllib.parse.urlencode({'address': address})
     print('Retrieving', url)
     uh = urllib.request.urlopen(url, context=ctx)
     data = uh.read().decode()
@@ -23,14 +22,11 @@ while True:
     except:
         js = None
 
-    if not js or 'features' not in js:
-        print('==== Download Error ====')
+    if not js or 'status' not in js or js['status'] != 'OK':
+        print('==== Failure To Retrieve ====')
         print(data)
         continue
 
-    if not js['features']:
-        print('==== Location Not Found ====')
-        continue
-
-    plus_code = js['features'][0]['properties']['plus_code']
-    print('Plus code:', plus_code)
+    lat = js['results'][0]['geometry']['location']['lat']
+    lng = js['results'][0]['geometry']['location']['lng']
+    print('lat', lat, 'lng', lng)
