@@ -67,30 +67,3 @@ with csv_path.open(encoding='utf-8-sig', newline='') as file:
             length = int(length)
         except ValueError:
             continue
-
-        cur.execute('INSERT OR IGNORE INTO Artist (name) VALUES (?)', (artist,))
-        cur.execute('SELECT id FROM Artist WHERE name = ?', (artist,))
-        artist_id = cur.fetchone()[0]
-
-        cur.execute('INSERT OR IGNORE INTO Genre (name) VALUES (?)', (genre,))
-        cur.execute('SELECT id FROM Genre WHERE name = ?', (genre,))
-        genre_id = cur.fetchone()[0]
-
-        cur.execute(
-            'INSERT OR IGNORE INTO Album (title, artist_id) VALUES (?, ?)',
-            (album, artist_id),
-        )
-        cur.execute('SELECT id FROM Album WHERE title = ?', (album,))
-        album_id = cur.fetchone()[0]
-
-        cur.execute(
-            '''INSERT OR REPLACE INTO Track
-               (title, album_id, genre_id, len, rating, count)
-               VALUES (?, ?, ?, ?, ?, ?)''',
-            (title, album_id, genre_id, length, rating, play_count),
-        )
-        imported += 1
-
-conn.commit()
-conn.close()
-print(f'Imported {imported} tracks into {database.name}.')

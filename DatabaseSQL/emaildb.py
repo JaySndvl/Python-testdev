@@ -1,4 +1,3 @@
-import sqlite3
 from pathlib import Path
 
 folder = Path(__file__).resolve().parent
@@ -11,13 +10,6 @@ cur.execute('CREATE TABLE Counts (org TEXT, count INTEGER)')
 
 fname = input('Enter file name: ').strip() or 'mbox.txt'
 file_path = Path(fname)
-if not file_path.is_absolute():
-    file_path = folder / file_path
-
-if not file_path.is_file():
-    raise FileNotFoundError(f'File not found: {file_path}')
-
-fh = file_path.open(encoding='utf-8')
 for line in fh:
     if not line.startswith('From: '): continue
     pieces = line.split()
@@ -35,5 +27,3 @@ sqlstr = 'SELECT org, count FROM Counts ORDER BY count DESC LIMIT 10'
 
 for row in cur.execute(sqlstr):
     print(str(row[0]), row[1])
-    
-cur.close()
